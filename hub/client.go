@@ -1,0 +1,41 @@
+package hub
+
+import (
+	"log"
+
+	"github.com/gorilla/websocket"
+)
+
+type Client struct{
+	hub *Hub
+	conn *websocket.Conn
+	send chan []byte
+}
+
+func (c *Client) readPump(){
+	defer func() {
+		c.hub.unregister <- c
+		c.conn.Close()
+	}()
+
+	for {
+		_, msg, err := c.conn.ReadMessage()
+		if err!= nil {
+			log.Println("read error:", err)
+			break
+		}
+		c.hub.broadcast <- msg
+	}
+
+}
+
+func (c *Client) writePump(){
+	defer c.conn.Close()
+
+	for msg := range c.send {
+		if err := c.conn.WriteMessage(websocket.TextMessage, msg); err != nil {
+			log.Println("write error", err)
+			return	
+		}
+	}
+}
