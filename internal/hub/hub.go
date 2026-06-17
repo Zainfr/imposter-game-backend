@@ -8,7 +8,7 @@ import (
 
 type Hub struct {
 	clients map[*Client]bool
-	broadcast chan []byte
+	broadcast chan IncomingMessage
 	register chan *Client
 	unregister chan *Client
 }
@@ -16,7 +16,7 @@ type Hub struct {
 func NewHub() *Hub{
 	return &Hub{
 		clients: make(map[*Client]bool),
-		broadcast: make(chan []byte),
+		broadcast: make(chan IncomingMessage),
 		register: make(chan *Client),
 		unregister: make(chan *Client),
 	}
@@ -61,7 +61,7 @@ func (h *Hub) ServeWS(w http.ResponseWriter, r *http.Request) error {
 	client := &Client{
 		hub: h,
 		conn: conn,
-		send: make(chan []byte, 256),
+		send: make(chan IncomingMessage, 256),
 	}
 	h.register <- client
 	go client.readPump()
