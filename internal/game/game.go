@@ -34,27 +34,34 @@ const (
 )
 
 func (g *Game) StartGame(words []string) error {
-	if g.CurrentPhase != PhaseLobby {
-		return errors.New("The game's current phase is not lobby.")
-	}
+    if g.CurrentPhase != PhaseLobby {
+        return errors.New("game is not in lobby phase")
+    }
 
-	if len(g.Players) < 3 {
-		return errors.New("Players must atleast be 3 to start the game.")
-	}
+    if len(g.Players) < 3 {
+        return errors.New("at least 3 players are required to start")
+    }
 
-	secretWord := words[rand.Intn(len(words))]
-	g.SecretWord = secretWord
+    g.SecretWord = words[rand.Intn(len(words))]
 
-	ids := make([]string, 0, len(g.Players))
-	for id := range g.Players {
-		ids = append(ids, id)
-	}
+    ids := make([]string, 0, len(g.Players))
+    for id := range g.Players {
+        ids = append(ids, id)
+    }
+    imposterID := ids[rand.Intn(len(ids))]
+    g.Players[imposterID].IsImposter = true
 
-	imposterId := ids[rand.Intn(len(ids))]
-	g.Players[imposterId].IsImposter = true
+    g.CurrentPhase = PhaseWordDistribution
+    return nil
+}
 
-	g.CurrentPhase = PhaseWordDistribution
-	
-	return nil
-
+func (g *Game) WordForPlayer(playerID string) string {
+    player, ok := g.Players[playerID]
+    if !ok {
+        return ""
+    }
+    if player.IsImposter {
+        return ""
+    }
+    return g.SecretWord
 }
