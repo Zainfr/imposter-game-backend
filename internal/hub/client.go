@@ -10,7 +10,8 @@ import (
 type Client struct{
 	hub *Hub
 	conn *websocket.Conn
-	send chan IncomingMessage
+	send chan OutgoingMessage
+	ID string
 }
 
 func (c *Client) readPump(){
@@ -30,6 +31,7 @@ func (c *Client) readPump(){
 			log.Println("read error:", err2)
 			continue
 		}
+		msg.Client = c
 		c.hub.broadcast <- msg
 	}
 

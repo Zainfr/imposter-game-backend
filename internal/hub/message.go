@@ -3,11 +3,24 @@ package hub
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/google/uuid"
 )
 
 type IncomingMessage struct {
+    Client *Client
 	Type string `json:"type"`
 	Payload json.RawMessage `json:"payload"`
+}
+
+type OutgoingMessage struct {
+    Type string `json:"type"`
+    Payload any `json:"payload"`
+}
+
+type PlayerJoinedPayload struct {
+	ID string `json:"id"`
+	Name string `json:"name"`
 }
 
 type SubmitCluePayload struct {
@@ -27,4 +40,8 @@ func DecodeEnvelope(raw []byte) (IncomingMessage, error) {
         return IncomingMessage{}, fmt.Errorf("missing message type")
     }
     return msg, nil
+}
+
+func generateID() string {
+	return uuid.New().String()
 }

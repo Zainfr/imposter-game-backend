@@ -65,3 +65,16 @@ func (g *Game) WordForPlayer(playerID string) string {
     }
     return g.SecretWord
 }
+
+var WordList = []string{
+	"Ocean",
+	"Galaxy",
+	"Mountain",
+	"Library",
+	"Desert",
+	"Volcano",
+	"Orchestra",
+	"Rainforest",
+	"Architecture",
+	"Astronaut",
+}
